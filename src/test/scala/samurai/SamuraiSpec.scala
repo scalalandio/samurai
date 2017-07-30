@@ -66,8 +66,6 @@ class SamuraiSpec extends WordSpec with MustMatchers {
 
     "expand simple 1-arg Show SAM-like implementation" in {
 
-
-//      val intShow: Show[Int] = sam[Show[Int]]((x: Int) => x.toString)
       @sam val intShow: Show[Int] = (x: Int) => x.toString
 
       intShow.show(5) mustBe "5"
@@ -75,8 +73,6 @@ class SamuraiSpec extends WordSpec with MustMatchers {
 
     "expand simple 2-arg Show SAM-like implementation" in {
 
-
-//      val intEq = sam[Eq[Int]]((x1: Int, x2: Int) => x1 == x2)
       @sam val intEq: Eq[Int] = (x1: Int, x2: Int) => x1 == x2
 
       intEq.eq(5, 5) mustBe true
