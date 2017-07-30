@@ -78,6 +78,17 @@ class SamuraiSpec extends WordSpec with MustMatchers {
 
       intEq.eq(5, 5) mustBe true
     }
+
+    "expand SAM-like definitions with type parameters and implicit parameters" in {
+
+      @sam implicit val intShow: Show[Int] = (x: Int) => x.toString
+      @sam implicit val intStr: Show[String] = (x: String) => x
+
+      @sam implicit def tupleInst[A, B](implicit s1: Show[A], s2: Show[B]): Show[(A, B)] =
+        (s: (A, B)) => s"(${s1.show(s._1)}, ${s2.show(s._2)})"
+
+      implicitly[Show[(Int, String)]].show((10, "abc")) mustBe "(10, abc)"
+    }
   }
 
 }
