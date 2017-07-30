@@ -84,8 +84,8 @@ class SamuraiSpec extends WordSpec with MustMatchers {
       @sam implicit val intShow: Show[Int] = (x: Int) => x.toString
       @sam implicit val intStr: Show[String] = (x: String) => x
 
-      @sam implicit def tupleInst[A, B](implicit s1: Show[A], s2: Show[B]): Show[(A, B)] =
-        (s: (A, B)) => s"(${s1.show(s._1)}, ${s2.show(s._2)})"
+      @sam implicit def tupleInst[A: Show, B: Show]: Show[(A, B)] =
+        (s: (A, B)) => s"(${implicitly[Show[A]].show(s._1)}, ${implicitly[Show[B]].show(s._2)})"
 
       implicitly[Show[(Int, String)]].show((10, "abc")) mustBe "(10, abc)"
     }
