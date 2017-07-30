@@ -21,33 +21,34 @@ package object samurai {
     // target: for 2.11
     def instImpl(c: whitebox.Context)(annottees: c.Expr[Any]*): c.Expr[Any] = {
       import c.universe._
-      val (xxx: ValOrDefDef) :: Nil = annottees.map(_.tree).toList
-      val (f: Function) = xxx.rhs.asInstanceOf[Function]
+      val (inst: ValOrDefDef) :: Nil = annottees.map(_.tree).toList
+      val samFunction = inst.rhs.asInstanceOf[Function]
 
-      val TC = xxx.tpt
-
-      val TCName = TC.asInstanceOf[AppliedTypeTree].tpt.asInstanceOf[Ident].name
+      val tc = inst.tpt
+      val tcName = inst.tpt.asInstanceOf[AppliedTypeTree].tpt.asInstanceOf[Ident].name
 
       // TODO: fix this
-      val tcFullName = "samurai." + TCName
+      val tcFullName = "samurai." + tcName
 
       val tcClz = c.mirror.staticClass(tcFullName)
-      val abstractMembers = tcClz.typeSignature.members.filter(_.isAbstract)
+      val abstractMembers = tcClz.typeSignature.members.filter(_.isAbstract).toList
 
-      if(abstractMembers.size != 1) {
-        c.abort(
-          c.enclosingPosition,
-          s"$tcClz has not single abstract method, but ${abstractMembers.size} ${abstractMembers.map(_.name).mkString("(",", ", ")")}"
-        )
-      } else {
+      abstractMembers match {
+        case List(m) =>
 
-        def samSymbol = abstractMembers.head.asMethod
+          val samSymbol = m.asMethod
 
-        val samName = samSymbol.name.toTermName
-        val samRetType = samSymbol.returnType
-        val tree = q"${xxx.mods} val ${xxx.name}: ${xxx.tpe} = new $TC { def $samName(..${f.vparams}): $samRetType = ${f.body} }"
+          val samName = samSymbol.name.toTermName
+          val samRetType = samSymbol.returnType
+          val tree = q"${inst.mods} val ${inst.name}: $tc = new $tc { def $samName(..${samFunction.vparams}): $samRetType = ${samFunction.body} }"
 
-        c.Expr[Any](tree)
+          c.Expr[Any](tree)
+
+        case ms =>
+          c.abort(
+            c.enclosingPosition,
+            s"$tcClz has not single abstract method, but ${ms.size} ${ms.map(_.name).mkString("(",", ", ")")}"
+          )
       }
     }
 
