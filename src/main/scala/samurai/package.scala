@@ -24,9 +24,15 @@ package object samurai {
       val (inst: ValOrDefDef) :: Nil = annottees.map(_.tree).toList
       val samFunction = inst.rhs.asInstanceOf[Function]
 
-      val tc = inst.tpt.asInstanceOf[AppliedTypeTree]
-      val tcName = tc.tpt.asInstanceOf[Ident].name
-      val wildcards = tc.args.map(_ => "_").mkString("[", ",", "]")
+      println(inst.tpt.getClass)
+
+      val (tcName, wildcards) = inst.tpt match {
+        case att: AppliedTypeTree =>
+          (att.tpt.asInstanceOf[Ident].name, att.args.map(_ => "_").mkString("[", ",", "]"))
+        case idt: Ident =>
+          (idt.name, "")
+      }
+
       val ttt = c.parse(s"val x: $tcName$wildcards = null").asInstanceOf[ValDef]
       val tcFullName = c.typecheck(q"??? : ${ttt.asInstanceOf[ValDef].tpt}").tpe.typeSymbol.fullName
       val tcClz = c.mirror.staticClass(tcFullName)
@@ -40,7 +46,7 @@ package object samurai {
           val samRetType = samSymbol.returnType
 
           val samDefTree = q"def $samName(..${samFunction.vparams}): $samRetType = ${samFunction.body}"
-          val instRhs = q"new $tc { $samDefTree }"
+          val instRhs = q"new ${inst.tpt} { $samDefTree }"
 
           val tree =
             inst match {
