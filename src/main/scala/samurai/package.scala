@@ -1,40 +1,55 @@
+
+import scala.annotation.{StaticAnnotation, compileTimeOnly}
 import scala.reflect.macros.whitebox
 
 package object samurai {
 
-  def sam[TC](f: () => Any): TC = macro SamuraiMacros.samImpl[TC]
-  def sam[TC](f: Nothing => Any): TC = macro SamuraiMacros.samImpl[TC]
-  def sam[TC](f: (Nothing, Nothing) => Any): TC = macro SamuraiMacros.samImpl[TC]
+  @compileTimeOnly("enable macro paradise to expand macro annotations")
+  class sam extends StaticAnnotation {
+    def macroTransform(annottees: Any*): Any = macro SamuraiMacros.instImpl
+  }
 
   private object SamuraiMacros {
 
-    def samImpl[TC: c.WeakTypeTag]
-      (c: whitebox.Context)
-      (f: c.Tree): c.Tree = {
-
+    // target: for 2.12+
+    def identityImpl(c: whitebox.Context)(annottees: c.Expr[Any]*): c.Expr[Any] = {
       import c.universe._
+      val (xxx: ValOrDefDef) :: Nil = annottees.map(_.tree).toList
+      c.Expr[Any](q"$xxx")
+    }
 
-      println(s"enclosingPos: ${c.enclosingPosition}")
+    // target: for 2.11
+    def instImpl(c: whitebox.Context)(annottees: c.Expr[Any]*): c.Expr[Any] = {
+      import c.universe._
+      val (xxx: ValOrDefDef) :: Nil = annottees.map(_.tree).toList
+      val (f: Function) = xxx.rhs.asInstanceOf[Function]
 
-      val TC = weakTypeOf[TC]
-//      val Args = weakTypeOf[Args]
-//      val Ret = weakTypeOf[Ret]
+      val TC = xxx.tpt
 
-      println("prefix is: " + c.prefix.tree)
+      val TCName = TC.asInstanceOf[AppliedTypeTree].tpt.asInstanceOf[Ident].name
 
-      println("TC is: " + TC.toString())
-//      println("Args is: " + Args.toString())
-//      println("Ret is: " + Ret.toString())
+      // TODO: fix this
+      val tcFullName = "samurai." + TCName
 
+      val tcClz = c.mirror.staticClass(tcFullName)
+      val abstractMembers = tcClz.typeSignature.members.filter(_.isAbstract)
 
-      println("f is: " + f.toString())
+      if(abstractMembers.size != 1) {
+        c.abort(
+          c.enclosingPosition,
+          s"$tcClz has not single abstract method, but ${abstractMembers.size} ${abstractMembers.map(_.name).mkString("(",", ", ")")}"
+        )
+      } else {
 
-      q"$f : $TC"
+        def samSymbol = abstractMembers.head.asMethod
+
+        val samName = samSymbol.name.toTermName
+        val samRetType = samSymbol.returnType
+        val tree = q"${xxx.mods} val ${xxx.name}: ${xxx.tpe} = new $TC { def $samName(..${f.vparams}): $samRetType = ${f.body} }"
+
+        c.Expr[Any](tree)
+      }
     }
 
   }
-
-
-
 }
-
