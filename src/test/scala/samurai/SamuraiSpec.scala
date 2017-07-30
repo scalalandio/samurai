@@ -17,6 +17,7 @@ class SamuraiSpec extends WordSpec with MustMatchers {
 
   "Samurai" must {
 
+
     "expand simple 0-arg Show SAM-like implementation" when {
 
       "declared as val" in {

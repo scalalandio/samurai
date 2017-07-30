@@ -24,12 +24,11 @@ package object samurai {
       val (inst: ValOrDefDef) :: Nil = annottees.map(_.tree).toList
       val samFunction = inst.rhs.asInstanceOf[Function]
 
-      val tc = inst.tpt
-      val tcName = inst.tpt.asInstanceOf[AppliedTypeTree].tpt.asInstanceOf[Ident].name
-
-      // TODO: fix this
-      val tcFullName = "samurai." + tcName
-
+      val tc = inst.tpt.asInstanceOf[AppliedTypeTree]
+      val tcName = tc.tpt.asInstanceOf[Ident].name
+      val wildcards = tc.args.map(_ => "_").mkString("[", ",", "]")
+      val ttt = c.parse(s"val x: $tcName$wildcards = null").asInstanceOf[ValDef]
+      val tcFullName = c.typecheck(q"??? : ${ttt.asInstanceOf[ValDef].tpt}").tpe.typeSymbol.fullName
       val tcClz = c.mirror.staticClass(tcFullName)
       val abstractMembers = tcClz.typeSignature.members.filter(_.isAbstract)
 
