@@ -5,9 +5,11 @@ import org.scalatest.{MustMatchers, WordSpec}
 trait Hello[T] {
   def sayHello(): String
 }
+
 trait Show[T] {
   def show(x: T): String
 }
+
 trait Eq[T] {
   def eq(x1: T, x2: T): Boolean
 }
