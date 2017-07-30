@@ -14,8 +14,8 @@ package object samurai {
     // target: for 2.12+
     def identityImpl(c: whitebox.Context)(annottees: c.Expr[Any]*): c.Expr[Any] = {
       import c.universe._
-      val (xxx: ValOrDefDef) :: Nil = annottees.map(_.tree).toList
-      c.Expr[Any](q"$xxx")
+      val (inst: ValOrDefDef) :: Nil = annottees.map(_.tree).toList
+      c.Expr[Any](q"$inst")
     }
 
     // target: for 2.11
@@ -31,16 +31,27 @@ package object samurai {
       val tcFullName = "samurai." + tcName
 
       val tcClz = c.mirror.staticClass(tcFullName)
-      val abstractMembers = tcClz.typeSignature.members.filter(_.isAbstract).toList
+      val abstractMembers = tcClz.typeSignature.members.filter(_.isAbstract)
 
-      abstractMembers match {
+      abstractMembers.toList match {
         case List(m) =>
 
           val samSymbol = m.asMethod
-
           val samName = samSymbol.name.toTermName
           val samRetType = samSymbol.returnType
-          val tree = q"${inst.mods} val ${inst.name}: $tc = new $tc { def $samName(..${samFunction.vparams}): $samRetType = ${samFunction.body} }"
+
+          val samDefTree = q"def $samName(..${samFunction.vparams}): $samRetType = ${samFunction.body}"
+          val instRhs = q"new $tc { $samDefTree }"
+
+          val tree =
+            inst match {
+              case dd: DefDef =>
+                q"${dd.mods} def ${dd.name}[..${dd.tparams}](...${dd.vparamss}): ${dd.tpt} = $instRhs"
+
+              case vd: ValDef =>
+                q"${vd.mods} val ${vd.name}: ${vd.tpt} = $instRhs"
+            }
+          println(tree)
 
           c.Expr[Any](tree)
 
