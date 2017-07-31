@@ -14,19 +14,9 @@ trait Eq[T] {
   def eq(x1: T, x2: T): Boolean
 }
 
-trait FullyDefined {
-  def abc(s1: String, s2: String): String = s1
-}
-trait TwoAbstractMethods {
-  def m1(x: String): String
-  def m2(x: Int): Int
-}
-
-
 class SamuraiSpec extends WordSpec with MustMatchers {
 
   "Samurai" must {
-
 
     "expand simple 0-arg Show SAM-like implementation" when {
 
@@ -100,6 +90,10 @@ class SamuraiSpec extends WordSpec with MustMatchers {
 
       "no abstract method" in {
 
+        trait FullyDefined {
+          def abc(s1: String, s2: String): String = s1
+        }
+
         assertTypeError {
           """
              @sam val fd: FullyDefined = (s1: String, s2: String) => s1 + s2
@@ -108,6 +102,11 @@ class SamuraiSpec extends WordSpec with MustMatchers {
       }
 
       "more than one abstract method" in {
+
+        trait TwoAbstractMethods {
+          def m1(x: String): String
+          def m2(x: Int): Int
+        }
 
         assertTypeError {
           """
