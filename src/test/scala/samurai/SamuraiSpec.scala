@@ -2,7 +2,7 @@ package samurai
 
 import org.scalatest.{MustMatchers, WordSpec}
 
-trait Hello[T] {
+trait Hello {
   def sayHello(): String
 }
 
@@ -21,58 +21,130 @@ class SamuraiSpec extends WordSpec with MustMatchers {
     "expand simple 0-arg Show SAM-like implementation" when {
 
       "declared as val" in {
-        @sam val intHello: Hello[Int] = () => "Hello1"
-        intHello.sayHello mustBe "Hello1"
+        @sam val hello: Hello = () => "Hello1"
+        hello.sayHello mustBe "Hello1"
       }
 
       "declared as def" in {
-        @sam def intHello2: Hello[Int] = () => "Hello2"
-        intHello2.sayHello mustBe "Hello2"
+        @sam def hello2: Hello = () => "Hello2"
+        hello2.sayHello mustBe "Hello2"
       }
 
       "declared as var" in {
-        @sam var intHello3: Hello[Int] = () => "Hello3"
-        intHello3.sayHello mustBe "Hello3"
+        @sam var hello3: Hello = () => "Hello3"
+        hello3.sayHello mustBe "Hello3"
       }
 
       "declared as lazy val" in {
-        @sam lazy val intHello4: Hello[Int] = () => "Hello4"
-        intHello4.sayHello mustBe "Hello4"
+        @sam lazy val hello4: Hello = () => "Hello4"
+        hello4.sayHello mustBe "Hello4"
       }
 
       "declared as implicit val" in {
-        @sam implicit val intHello: Hello[Int] = () => "Hello5"
-        implicitly[Hello[Int]].sayHello mustBe "Hello5"
+        @sam implicit val hello: Hello = () => "Hello5"
+        implicitly[Hello].sayHello mustBe "Hello5"
       }
 
       "declared as implicit def" in {
-        @sam implicit def intHello2: Hello[Int] = () => "Hello6"
-        implicitly[Hello[Int]].sayHello mustBe "Hello6"
+        @sam implicit def hello2: Hello = () => "Hello6"
+        implicitly[Hello].sayHello mustBe "Hello6"
       }
 
       "declared as implicit var" in {
-        @sam implicit var intHello3: Hello[Int] = () => "Hello7"
-        implicitly[Hello[Int]].sayHello mustBe "Hello7"
+        @sam implicit var hello3: Hello = () => "Hello7"
+        implicitly[Hello].sayHello mustBe "Hello7"
       }
 
       "declared as implicit lazy val" in {
-        @sam implicit lazy val intHello4: Hello[Int] = () => "Hello8"
-        implicitly[Hello[Int]].sayHello mustBe "Hello8"
+        @sam implicit lazy val hello4: Hello = () => "Hello8"
+        implicitly[Hello].sayHello mustBe "Hello8"
       }
     }
 
-    "expand simple 1-arg Show SAM-like implementation" in {
+    "expand simple 1-arg Show SAM-like implementation" when {
 
-      @sam val intShow: Show[Int] = (x: Int) => x.toString
+      "declared as val" in {
+        @sam val intShow: Show[Int] = (x: Int) => x.toString
+        intShow.show(5) mustBe "5"
+      }
 
-      intShow.show(5) mustBe "5"
+      "declared as def" in {
+        @sam def intShow: Show[Int] = (x: Int) => x.toString
+        intShow.show(5) mustBe "5"
+      }
+
+      "declared as var" in {
+        @sam var intShow: Show[Int] = (x: Int) => x.toString
+        intShow.show(5) mustBe "5"
+      }
+
+      "declared as lazy val" in {
+        @sam lazy val intShow: Show[Int] = (x: Int) => x.toString
+        intShow.show(5) mustBe "5"
+      }
+
+      "declared as implicit val" in {
+        @sam implicit val intShow: Show[Int] = (x: Int) => x.toString
+        implicitly[Show[Int]].show(5) mustBe "5"
+      }
+
+      "declared as implicit def" in {
+        @sam implicit def intShow: Show[Int] = (x: Int) => x.toString
+        implicitly[Show[Int]].show(5) mustBe "5"
+      }
+
+      "declared as implicit var" in {
+        @sam implicit var intShow: Show[Int] = (x: Int) => x.toString
+        implicitly[Show[Int]].show(5) mustBe "5"
+      }
+
+      "declared as implicit lazy val" in {
+        @sam implicit lazy val intShow: Show[Int] = (x: Int) => x.toString
+        implicitly[Show[Int]].show(5) mustBe "5"
+      }
     }
 
-    "expand simple 2-arg Show SAM-like implementation" in {
+    "expand simple 2-arg Show SAM-like implementation" when {
 
-      @sam val intEq: Eq[Int] = (x1: Int, x2: Int) => x1 == x2
+      "declared as val" in {
+        @sam val intEq: Eq[Int] = (x1: Int, x2: Int) => x1 == x2
+        intEq.eq(5, 5) mustBe true
+      }
 
-      intEq.eq(5, 5) mustBe true
+      "declared as def" in {
+        @sam def intEq: Eq[Int] = (x1: Int, x2: Int) => x1 == x2
+        intEq.eq(5, 5) mustBe true
+      }
+
+      "declared as var" in {
+        @sam var intEq: Eq[Int] = (x1: Int, x2: Int) => x1 == x2
+        intEq.eq(5, 5) mustBe true
+      }
+
+      "declared as lazy val" in {
+        @sam lazy val intEq: Eq[Int] = (x1: Int, x2: Int) => x1 == x2
+        intEq.eq(5, 5) mustBe true
+      }
+
+      "declared as implicit val" in {
+        @sam implicit val intEq: Eq[Int] = (x1: Int, x2: Int) => x1 == x2
+        implicitly[Eq[Int]].eq(5, 5) mustBe true
+      }
+
+      "declared as implicit def" in {
+        @sam implicit def intEq: Eq[Int] = (x1: Int, x2: Int) => x1 == x2
+        implicitly[Eq[Int]].eq(5, 5) mustBe true
+      }
+
+      "declared as implicit var" in {
+        @sam implicit var intEq: Eq[Int] = (x1: Int, x2: Int) => x1 == x2
+        implicitly[Eq[Int]].eq(5, 5) mustBe true
+      }
+
+      "declared as implicit lazy val" in {
+        @sam implicit lazy val intEq: Eq[Int] = (x1: Int, x2: Int) => x1 == x2
+        implicitly[Eq[Int]].eq(5, 5) mustBe true
+      }
     }
 
     "expand SAM-like definitions with type parameters and implicit parameters" in {
@@ -86,7 +158,7 @@ class SamuraiSpec extends WordSpec with MustMatchers {
       implicitly[Show[(Int, String)]].show((10, "abc")) mustBe "(10, abc)"
     }
 
-    "produce type error" when {
+    "produce compilation error" when {
 
       "no abstract method" in {
 

@@ -24,8 +24,6 @@ package object samurai {
       val (inst: ValOrDefDef) :: Nil = annottees.map(_.tree).toList
       val samFunction = inst.rhs.asInstanceOf[Function]
 
-      println(inst.tpt.getClass)
-
       val (tcName, wildcards) = inst.tpt match {
         case att: AppliedTypeTree =>
           (att.tpt.asInstanceOf[Ident].name, att.args.map(_ => "_").mkString("[", ",", "]"))
@@ -56,7 +54,6 @@ package object samurai {
               case vd: ValDef =>
                 q"${vd.mods} val ${vd.name}: ${vd.tpt} = $instRhs"
             }
-          println(tree)
 
           c.Expr[Any](tree)
 
