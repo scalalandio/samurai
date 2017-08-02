@@ -1,5 +1,6 @@
 
 import scala.annotation.{StaticAnnotation, compileTimeOnly}
+import scala.language.experimental.macros
 
 package object samurai {
 
