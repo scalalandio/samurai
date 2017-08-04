@@ -1,6 +1,7 @@
 # Samurai
 
 [![Build Status](https://travis-ci.org/scalalandio/samurai.svg?branch=master)](https://travis-ci.org/scalalandio/samurai)
+[![Maven Central](https://img.shields.io/maven-central/v/io.scalaland/samurai_2.11.svg)](http://search.maven.org/#search%7Cga%7C1%7Csamurai)
 [![License](http://img.shields.io/:license-Apache%202-green.svg)](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
 SAM-like macro annotation for Scala
@@ -83,3 +84,17 @@ implicit def tupleInst[A, B](implicit s1: Show[A], s2: Show[B]): Show[(A, B)] =
     def show(s: (A, B)): String = s"(${s1.show(p._1)}, ${s2.show(p._2)})"
   }
 ```
+
+### Quirks
+
+I observed that this approach might not work for every local type definition,
+because of the quirks of scala reflection API, so recommended approach
+is to define all your traits/abstract classes that you want to instantiate
+with `@sam` annotation as top-level ones.
+
+## Cross compilation
+
+The library is cross-compiled on 2.11 and 2.12. On Scala 2.11 it performs
+real expansion described above, while on 2.12 it relies on native
+support provided by compiler, so it actually doesn't transform the
+original definition in any way.
