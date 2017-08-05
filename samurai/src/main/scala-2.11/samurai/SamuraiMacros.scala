@@ -7,7 +7,12 @@ object SamuraiMacros {
   def instImpl(c: whitebox.Context)(annottees: c.Expr[Any]*): c.Expr[Any] = {
     import c.universe._
     val (inst: ValOrDefDef) :: Nil = annottees.map(_.tree).toList
-    val samFunction = inst.rhs.asInstanceOf[Function]
+
+    val samFunction = inst.rhs match {
+      case f: Function => f
+      case _ =>
+        c.abort(c.enclosingPosition, "@sam annotation requires a function definition!")
+    }
 
     val (tcName, wildcards) = inst.tpt match {
       case att: AppliedTypeTree =>
@@ -26,9 +31,8 @@ object SamuraiMacros {
 
         val samSymbol = m.asMethod
         val samName = samSymbol.name.toTermName
-        val samRetType = samSymbol.returnType
 
-        val samDefTree = q"def $samName(..${samFunction.vparams}): $samRetType = ${samFunction.body}"
+        val samDefTree = q"def $samName(..${samFunction.vparams}) = ${samFunction.body}"
         val instRhs = q"new ${inst.tpt} { $samDefTree }"
 
         val tree =
