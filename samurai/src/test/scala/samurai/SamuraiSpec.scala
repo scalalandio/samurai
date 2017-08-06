@@ -162,6 +162,13 @@ class SamuraiSpec extends WordSpec with MustMatchers {
       implicitly[Show[(Int, String)]].show((10, "abc")) mustBe "(10, abc)"
     }
 
+    "expand SAM-like definition when type parameter appears in the return type" in {
+
+      @sam val idInt: Id[Int] = (x: Int) => x
+
+      idInt.id(5) mustBe 5
+    }
+
     "produce compilation error" when {
 
       "no abstract method" in {
