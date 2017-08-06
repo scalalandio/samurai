@@ -42,7 +42,7 @@ brings this nice syntax also Scala 2.11.
 You have to add following lines to your `build.sbt`:
 
 ```scala
-libraryDependencies += "io.scalaland" %% "samurai" % "1.0"
+libraryDependencies += "io.scalaland" %% "samurai" % "1.1" // triple %%% if you're on Scala.js
 
 resolvers += Resolver.sonatypeRepo("releases")
 addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full)
