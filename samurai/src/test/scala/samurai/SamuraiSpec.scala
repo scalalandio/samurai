@@ -14,6 +14,10 @@ trait Eq[T] {
   def eq(x1: T, x2: T): Boolean
 }
 
+trait Id[T] {
+  def id(x: T): T
+}
+
 class SamuraiSpec extends WordSpec with MustMatchers {
 
   "Samurai" must {
@@ -183,6 +187,16 @@ class SamuraiSpec extends WordSpec with MustMatchers {
         assertTypeError {
           """
              @sam val tam: TwoAbstractMethods = (x: String) => x
+          """
+        }
+      }
+
+      "not provided a function" in {
+        assertTypeError {
+          """
+             @sam val intShow: Show[Int] = new Show[Int] {
+               def show(x: Int): String = x.toString
+             }
           """
         }
       }
