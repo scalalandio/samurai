@@ -6,6 +6,13 @@
 
 SAM-like macro annotation for Scala
 
+> Note this project is experimental and probably doesn't cover all cases correctly.
+>
+> You can use compiler-supported SAM even in Scala 2.11 with `-Xexperimental` flag.
+>
+> **This project will not be loger maintained.**
+
+
 Scala 2.12 introduced simplified syntax for defining instances of
 classes/traits that contain single abstract method. Considering
 following interface:
@@ -30,9 +37,9 @@ we can simply write
 val intShow: Show[Int] = (x: Int) => x.toString
 ```
 
-Unfortunately, in Scala 2.11 such a syntax is not possible and for
+~Unfortunately, in Scala 2.11 such a syntax is not possible and for
 every type we have to either define separate helper function or
-live with this boilerplate.
+live with this boilerplate.~ It's possible with `-Xexperimental`.
 
 Samurai library defines macro annotation called `@sam` that
 brings this nice syntax also Scala 2.11.
